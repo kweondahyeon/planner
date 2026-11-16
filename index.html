@@ -873,7 +873,7 @@ function renderReview(){
   const v = state.reviewsHtml[RY] || '';
   if (t.innerHTML !== v) t.innerHTML = v;
 }
-const RY = now.getFullYear();
+let RY = now.getFullYear();   // 평가 기록 연도 = 진입할 때 보고 있던 연도
 function saveReview(){ const t=$('#reviewText'); if (!state.reviewsHtml) state.reviewsHtml={};
   const c = t.cloneNode(true); c.querySelectorAll('[class]').forEach(x=>x.removeAttribute('class')); state.reviewsHtml[RY] = c.innerHTML; state.reviews[RY] = t.innerText; save(); }
 /* 디바이더 지원 텍스트 영역 공통 (평가 · 우측 MEMO) */
@@ -1005,7 +1005,7 @@ document.addEventListener('focusout', () => { if (isMobile()) setTimeout(() => {
 document.addEventListener('focusin', ev => {
   if (!isMobile()) return;
   const f = ev.target;
-  if ($('#panel').contains(f) && f.id!=='cText' && (f.isContentEditable || /^(INPUT|TEXTAREA)$/.test(f.tagName))){ document.body.classList.add('kb'); keepCaretVisible(); }
+  if (!sel && $('#panel').contains(f) && f.id!=='cText' && (f.isContentEditable || /^(INPUT|TEXTAREA)$/.test(f.tagName))){ document.body.classList.add('kb'); keepCaretVisible(); }   // TO DO·MEMO 팝업만 (일정 팝업은 크기·위치 고정)
 });
 function keepCaretVisible(){   // 팝업 안 스크롤 영역에서 커서가 가려지면 그 영역만 스크롤
   requestAnimationFrame(() => {
@@ -1090,7 +1090,7 @@ function goMonth(y,m){
 }
 function setMode(mo){
   curTd = null; $('#ttools').classList.remove('show');
-  if (mo==='review') commitDraft();
+  if (mo==='review'){ commitDraft(); RY = view.y; }
   mode = mo; render();
   if (mo==='review') setTimeout(()=>$('#reviewText').focus(),0);
 }
