@@ -317,7 +317,7 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
   #yprev svg,#ynext svg{width:18px;height:18px}
   #yprev path,#ynext path{stroke-width:2.2}
   #mseg,.spacer{display:none}
-  @media (display-mode: standalone){ .topbar{padding-top:max(calc(env(safe-area-inset-top) + 12px), 56px)} }
+  @media (display-mode: standalone){ .topbar{padding-top:calc(env(safe-area-inset-top) + 20px)} }
   .topbar .tlink{font-size:0;gap:0;width:36px;height:36px;padding:0;justify-content:center;color:var(--text)}
   .topbar .tlink svg{width:20px;height:20px}
   #todayBtn{order:1} #todoBtn{order:2} #reviewBtn{order:3} #setBtn{order:4;width:36px;height:36px}
@@ -358,9 +358,8 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
   body.mode-review #setBtn{display:none}
   body.mode-review .topbar{margin-bottom:0}
   /* 날짜 선택: 화면 가운데 팝업 (캘린더는 고정, 뒤 배경 딤) */
-  .panel,.panel.split{--ph:min(56dvh,480px);--pfit:min(var(--ph), calc(var(--vvh,100dvh) - 32px));position:fixed;left:12%;right:12%;width:auto;height:var(--pfit);top:calc(var(--vvt,0px) + max(16px, (var(--vvh,100dvh) - var(--pfit)) / 2));display:flex;flex-direction:column;gap:0;overflow:hidden;background:#fff;border-radius:24px;z-index:41;box-shadow:0 20px 60px rgba(0,0,0,.18);opacity:0;pointer-events:none;transform:none;transition:opacity .16s}
+  .panel,.panel.split{--ph:min(34dvh,288px);position:fixed;left:12%;right:12%;width:auto;height:var(--ph);top:calc(var(--vvt,0px) + (100dvh - var(--ph)) / 2);display:flex;flex-direction:column;gap:0;overflow:hidden;background:#fff;border-radius:24px;z-index:41;box-shadow:0 20px 60px rgba(0,0,0,.18);opacity:0;pointer-events:none;transform:none;transition:opacity .16s}
   .panel.open{opacity:1;pointer-events:auto;transform:none}
-  body.composing .panel{height:var(--ph);top:calc(var(--vvt,0px) + (100dvh - var(--ph)) / 2)}
   /* 키보드가 올라와 화면이 밀려도 뒤 캘린더는 제자리 */
   .topbar,.cal{transform:translateY(var(--vvt,0px))}
   .panel::after{content:"";position:absolute;inset:0;border-radius:inherit;background:rgba(0,0,0,.24);opacity:0;pointer-events:none;transition:opacity .16s;z-index:1}
