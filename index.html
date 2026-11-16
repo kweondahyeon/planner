@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#FAFAFA">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -306,15 +306,18 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
 .sheet-close{display:none}
 #todoBtn{display:none}
 @media (max-width:900px){
-  :root{--bg:#FFFFFF;--bar-h:16px;--bar-fs:10px;--bar-gap:4px;--head-h:38px;--gutter:0px}
+  :root{--bg:#FFFFFF;--bar-h:16px;--bar-fs:10px;--bar-gap:4px;--head-h:44px;--gutter:0px}
   html,body{overflow:hidden;overscroll-behavior:none}
-  #app{width:100%;height:100dvh;padding:0 0 calc(32px + env(safe-area-inset-bottom))}
+  #app{width:100%;height:100dvh;padding:0 0 max(12px, env(safe-area-inset-bottom))}
   /* 상단: 1줄(연도 · 아이콘) + 월 스트립 + 통계 */
-  .topbar{padding:max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 12px max(20px, env(safe-area-inset-left));gap:12px 4px;background:var(--bg);border-bottom:1px solid rgba(0,0,0,.08);margin-bottom:8px}
+  .topbar{padding:max(16px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 12px max(12px, env(safe-area-inset-left));gap:20px 4px;background:var(--bg);border-bottom:1px solid rgba(0,0,0,.08);margin-bottom:28px}
   .title{flex:1;order:0}
-  .title h1{font-size:24px}
+  .title h1{font-size:32px}
+  #yprev,#ynext{color:var(--text)}
+  #yprev svg,#ynext svg{width:18px;height:18px}
+  #yprev path,#ynext path{stroke-width:2.2}
   #mseg,.spacer{display:none}
-  @media (display-mode: standalone){ .topbar{padding-top:max(calc(env(safe-area-inset-top) + 24px), 68px)} }
+  @media (display-mode: standalone){ .topbar{padding-top:max(calc(env(safe-area-inset-top) + 12px), 56px)} }
   .topbar .tlink{font-size:0;gap:0;width:36px;height:36px;padding:0;justify-content:center;color:var(--text)}
   .topbar .tlink svg{width:20px;height:20px}
   #todayBtn{order:1} #todoBtn{order:2} #reviewBtn{order:3} #setBtn{order:4;width:36px;height:36px}
@@ -327,7 +330,7 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
   .mchip.on,.mchip.on:hover{background:transparent;color:#000;font-weight:800}
   .mchip.cur::before{display:none}
   .stats{display:none}
-  main{padding:0 16px}
+  main{padding:0}
   /* 캘린더: 흰 배경 · 선 없음 · 가운데 정렬 */
   .cal,.cal.anchored{background:#fff;border-radius:0;box-shadow:none}
   .dow{border-bottom:0}
@@ -335,23 +338,31 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
   .weeks{touch-action:pan-y;-webkit-touch-callout:none}
   .week{border-bottom:0}
   .wk{display:none}
-  .cell{border-left:0;padding:6px 0 0}
+  .cell{border-left:0;padding:8px 0 0}
   .cell:hover{background:transparent}
   .cell.out{background:transparent}
   .cell.insel,.cell.insel:hover{background:var(--selbg);border-radius:0}
   .cell.insel.sl{border-top-left-radius:12px;border-bottom-left-radius:12px}
   .cell.insel.sr{border-top-right-radius:12px;border-bottom-right-radius:12px}
-  .dhead{height:28px;justify-content:center}
-  .num{font-size:13px;font-weight:600;min-width:28px;height:28px;border-radius:14px}
+  .dhead{height:32px;justify-content:center}
+  .num{font-size:13px;font-weight:600;min-width:32px;height:32px;border-radius:16px}
   .cell.today .num,.cell.hol.today .num{display:grid;background:var(--today);color:#fff}
   .cell.today .num::before{display:none}
   .hname{display:none}
   .bar{padding:0 4px;margin:0 2px;align-items:center}
+  .bar:not(.cl){margin-left:4px} .bar:not(.cr){margin-right:4px}
   .bar .t{display:block;white-space:nowrap;text-overflow:ellipsis;-webkit-line-clamp:1}
-  .review .rh{padding:20px 20px 0} .rbody{padding:12px 20px 24px}
+  .review .rh{padding:20px 20px 0;flex-wrap:wrap;gap:8px} .rbody{padding:12px 20px 24px;font-size:16px;overflow-x:hidden}
+  .rbody table{table-layout:fixed;width:100%} .rbody td{min-width:0;padding:6px 8px;word-break:break-all}
+  .review{border-radius:0;background:#fff}
+  body.mode-review #setBtn{display:none}
+  body.mode-review .topbar{margin-bottom:0}
   /* 날짜 선택: 화면 가운데 팝업 (캘린더는 고정, 뒤 배경 딤) */
-  .panel,.panel.split{position:fixed;left:12%;right:12%;width:auto;height:min(56dvh,480px);top:calc(var(--vvt,0px) + 50% - min(28dvh,240px));display:flex;flex-direction:column;gap:0;overflow:hidden;background:#fff;border-radius:24px;z-index:41;box-shadow:0 20px 60px rgba(0,0,0,.18);opacity:0;pointer-events:none;transform:none;transition:opacity .16s}
+  .panel,.panel.split{--ph:min(56dvh,480px);--pfit:min(var(--ph), calc(var(--vvh,100dvh) - 32px));position:fixed;left:12%;right:12%;width:auto;height:var(--pfit);top:calc(var(--vvt,0px) + max(16px, (var(--vvh,100dvh) - var(--pfit)) / 2));display:flex;flex-direction:column;gap:0;overflow:hidden;background:#fff;border-radius:24px;z-index:41;box-shadow:0 20px 60px rgba(0,0,0,.18);opacity:0;pointer-events:none;transform:none;transition:opacity .16s}
   .panel.open{opacity:1;pointer-events:auto;transform:none}
+  body.composing .panel{height:var(--ph);top:calc(var(--vvt,0px) + (100dvh - var(--ph)) / 2)}
+  /* 키보드가 올라와 화면이 밀려도 뒤 캘린더는 제자리 */
+  .topbar,.cal{transform:translateY(var(--vvt,0px))}
   .panel::after{content:"";position:absolute;inset:0;border-radius:inherit;background:rgba(0,0,0,.24);opacity:0;pointer-events:none;transition:opacity .16s;z-index:1}
   body.composing .panel::after{opacity:1;pointer-events:auto}
   .panel .pb.scratch{border-radius:0;box-shadow:none!important;padding:20px 20px 12px}
@@ -363,6 +374,7 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
   .panel .pb.scratch.daybot{position:fixed;left:0;right:0;top:calc(var(--vvt,0px) + var(--vvh,100dvh));z-index:2;border-top:0;border-radius:24px 24px 0 0;background:#fff;box-shadow:0 -8px 32px rgba(0,0,0,.12);padding:16px 16px 12px;transform:translateY(0);visibility:hidden;transition:transform .2s ease-out,visibility 0s .2s}
   body.composing .panel .pb.scratch.daybot{transform:translateY(-100%);visibility:visible;transition:transform .2s ease-out}
   .panel .daybot .todoh{display:none}
+  .panel .pb.scratch.daybot::after{content:"";position:absolute;left:0;right:0;top:100%;height:420px;background:#fff}
   .panel .daybot .composer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 8px;margin:0;min-height:0}
   .panel .daybot .composer textarea{grid-column:1 / -1;order:-1;min-height:48px;max-height:30vh;padding:4px 4px 0}
   .panel .daybot .types{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0}
@@ -378,8 +390,9 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
 }
 @media (min-width:901px){#scrim{display:none} .addbar{display:none} #cText::placeholder{color:transparent}}
 #scrim{position:fixed;inset:0;background:rgba(0,0,0,.24);z-index:40;opacity:0;pointer-events:none;transition:opacity .16s}
+body:not(:has(.panel.open)) #scrim{display:none}
 body:has(.panel.open) #scrim{opacity:1;pointer-events:auto}
-#weeks.slide{transition:transform .16s ease-out,opacity .16s ease-out}
+#weeks.slide{transition:transform .12s ease-out,opacity .12s ease-out}
 </style>
 </head>
 <body>
@@ -793,7 +806,7 @@ function renderPanel(){
       <div class="todoh"><span>신규 일정 추가</span></div>
       <div class="composer">
         <div class="types">${Object.entries(TYPES).map(([k,v])=>`<button class="tchip ${k===ctype?'on':''}" data-ct="${k}"><i style="background:${v.color};${k==='memo'?'box-shadow:inset 0 0 0 1px var(--memo-bd)':''}"></i>${v.label}</button>`).join('')}</div>
-        <textarea id="cText" placeholder="일정을 입력하세요" enterkeyhint="done">${esc(draft)}</textarea>
+        <textarea id="cText" placeholder="일정을 입력하세요">${esc(draft)}</textarea>
         <button class="btn full" id="cAdd" ${draft.trim()?'':'disabled'}>등록</button>
       </div>
     </div>`;
@@ -1102,26 +1115,26 @@ $('#weeks').addEventListener('pointerdown', ev => {
     const r = bar.getBoundingClientRect();
     drag = {kind:'bar', id:e.id, mode: ev.target.classList.contains('rz')?'resize':'move', origin:d, start:e.start, end:e.end,
       sx:ev.clientX, sy:ev.clientY, gx:ev.clientX-r.left, gy:ev.clientY-r.top, bar, on:false, touch: ev.pointerType==='touch'};
-    if (drag.touch) drag.timer = setTimeout(()=>{ if (drag && drag.kind==='bar') startBarDrag(drag); }, 380);
+    if (drag.touch) drag.timer = setTimeout(()=>{ if (drag && drag.kind==='bar') startBarDrag(drag); }, 190);
   } else if (d){
     drag = {kind:'sel', anchor:d, cur:d, touch: ev.pointerType==='touch', x:ev.clientX, y:ev.clientY, mode:'pending'};
     if (!drag.touch){ commitDraft(); sel={a:d,b:d}; paintSel(); }   // 쓰던 내용은 원래 선택했던 날짜로 먼저 등록
     else drag.timer = setTimeout(() => {   // 터치: 길게 누르면 범위 선택 시작 → 드래그로 여러 날짜
       if (drag && drag.kind==='sel' && drag.mode==='pending'){ drag.mode='range'; commitDraft(); sel={a:d,b:d}; paintSel(); navigator.vibrate?.(10); }
-    }, 350);
+    }, 175);
   }
 });
+/* 터치로 팝업을 연 직후 같은 손가락의 클릭이 팝업/배경에 떨어져 바로 닫히는 것 방지 */
+let ghostUntil = 0;
+document.addEventListener('click', ev => { if (Date.now() < ghostUntil){ ghostUntil = 0; ev.stopPropagation(); ev.preventDefault(); } }, true);
 /* 좌우 스와이프로 달 이동 (모바일) */
 function finishSwipe(dx){
   const w = $('#weeks');
   if (Math.abs(dx) < 50){ w.classList.add('slide'); w.style.transform=''; w.style.opacity=''; return; }
   const dir = dx < 0 ? 1 : -1;
-  w.classList.add('slide'); w.style.transform = `translateX(${-dir*40}%)`; w.style.opacity = '0';
-  setTimeout(() => {
-    goMonth(view.y, view.m + dir);
-    w.classList.remove('slide'); w.style.transform = `translateX(${dir*30}%)`; void w.offsetWidth;
-    w.classList.add('slide'); w.style.transform = ''; w.style.opacity = '';
-  }, 160);
+  goMonth(view.y, view.m + dir);
+  w.classList.remove('slide'); w.style.transform = `translateX(${dir*24}px)`; w.style.opacity = '.6'; void w.offsetWidth;
+  w.classList.add('slide'); w.style.transform = ''; w.style.opacity = '';
 }
 window.addEventListener('pointercancel', () => {
   if (!drag) return;
@@ -1166,7 +1179,7 @@ window.addEventListener('pointermove', ev => {
         clearTimeout(drag.timer);
         if (Math.abs(dx) > Math.abs(dy)) drag.mode = 'swipe'; else { drag = null; return; }   // 세로면 스크롤
       }
-      if (drag.mode==='swipe'){ ev.preventDefault(); drag.dx = dx; const w=$('#weeks'); w.classList.remove('slide'); w.style.transform=`translateX(${dx*0.5}px)`; w.style.opacity = 1-Math.min(Math.abs(dx)/600,.4); return; }
+      if (drag.mode==='swipe'){ ev.preventDefault(); drag.dx = dx; const w=$('#weeks'); w.classList.remove('slide'); w.style.transform=`translateX(${dx*0.2}px)`; return; }
       if (drag.mode==='range'){ ev.preventDefault(); const d = dateAt(ev.clientX, ev.clientY); if (d && d!==drag.cur){ drag.cur=d; sel={a:drag.anchor,b:d}; paintSel(); } }
       return;
     }
@@ -1197,8 +1210,8 @@ window.addEventListener('pointerup', ev => {
     if (g.touch){
       clearTimeout(g.timer);
       if (g.mode==='swipe') return finishSwipe(g.dx||0);
-      if (g.mode==='range'){ const a = g.anchor<=g.cur?g.anchor:g.cur, b = g.anchor<=g.cur?g.cur:g.anchor; selectRange(a,b); return; }
-      const d=dateAt(ev.clientX,ev.clientY); if (d && Math.hypot(ev.clientX-g.x, ev.clientY-g.y)<10) selectRange(d,d); return;
+      if (g.mode==='range'){ const a = g.anchor<=g.cur?g.anchor:g.cur, b = g.anchor<=g.cur?g.cur:g.anchor; ghostUntil = Date.now()+500; selectRange(a,b); return; }
+      const d=dateAt(ev.clientX,ev.clientY); if (d && Math.hypot(ev.clientX-g.x, ev.clientY-g.y)<10){ ghostUntil = Date.now()+500; selectRange(d,d); } return;
     }
     const a = g.anchor<=g.cur?g.anchor:g.cur, b = g.anchor<=g.cur?g.cur:g.anchor;
     selectRange(a,b); return;
@@ -1206,7 +1219,7 @@ window.addEventListener('pointerup', ev => {
   clearTimeout(g.timer);
   document.body.classList.remove('bardrag'); clearDropMarks();
   g.ghost?.remove();
-  if (!g.on){ preview=null; openItem(g.id, g.origin); return; }
+  if (!g.on){ preview=null; if (g.touch && isMobile() && g.origin){ ghostUntil = Date.now()+500; selectRange(g.origin, g.origin); } else openItem(g.id, g.origin); return; }
   const ev0 = state.events.find(x=>x.id===g.id); if (!ev0){ render(); return; }
   if (g.mode==='resize'){
     const p = preview; preview=null;
