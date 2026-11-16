@@ -138,6 +138,12 @@ body.bardrag .bar{pointer-events:auto}
 .composer{flex:1 0 auto;display:flex;flex-direction:column;min-height:240px}
 .lists{flex:none;margin:8px -8px 0}
 .dtitle{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.alldone{margin-left:auto;display:flex;align-items:center;gap:6px;flex:none;font-size:12px;font-weight:600;letter-spacing:0;color:var(--text);padding:4px 0}
+.alldone .ck{width:14px;height:14px;border-radius:4px;border:1.5px solid #B7B7BE;display:grid;place-items:center;background:#fff}
+.alldone .ck.on{background:var(--text);border-color:var(--text)}
+.alldone .ck svg{width:9px;height:9px;display:none}
+.alldone .ck.on svg{display:block}
+.alldone:hover{opacity:.7}
 .pb.scratch.daytop{flex:0 1 auto;max-height:60%;min-height:0}
 .pb.scratch.daybot{flex:1 1 0;min-height:0}
 .daybot .composer{min-height:0;margin-top:12px}
@@ -634,6 +640,8 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2));
 const TODAY = toS(new Date());
 const ord = e => e.order ?? e.created ?? 0;
+const multi = e => 0;   // (묶음 구분 없음 — 등록순)
+const dayOrder = (a,b) => (ord(a)-ord(b)) || (a.start<b.start?-1:a.start>b.start?1:0);
 const isTask = e => e.type==='work' || e.type==='acct';
 const monthFirst = (y,m) => `${y}-${pad(m+1)}-01`;
 const monthLast = (y,m) => addDays(m===11 ? `${y+1}-01-01` : `${y}-${pad(m+2)}-01`, -1);
@@ -708,8 +716,7 @@ function rangeHTML(first, last, events, sa, sb, two){
     const we = week[6];
     if (!vis.some(s => s>=first && s<=last)){ ws = addDays(ws,7); continue; }
     wn++;
-    const list = events.filter(e => e.start<=we && e.end>=ws).sort((a,b) =>
-      (a.type==='memo')-(b.type==='memo') || (ord(a)-ord(b)) || (a.start<b.start?-1:a.start>b.start?1:0));
+    const list = events.filter(e => e.start<=we && e.end>=ws).sort(dayOrder);
     const segs = [];
     for (const e of list){
       const idx = vis.map((s,i)=>(s>=e.start && s<=e.end)?i:-1).filter(i=>i>=0);
@@ -759,13 +766,22 @@ function renderGrid(){
   // 날짜(열)별로 위에서부터 4px 간격으로 촘촘히 쌓기. 여러 날 일정은 걸친 열 중 가장 낮은 위치에 맞춤
   const gap = cssPx('--bar-gap'), cols = COLS.length;
   box.querySelectorAll('.week').forEach(w => {   // (아래 return은 forEach 콜백 종료)
-    const bars = w.querySelector('.bars'), bottoms = new Array(cols).fill(0);
+    // 등록순으로 배치하되, 각 일정은 걸친 날짜들에서 비어 있는 가장 위 공간에 들어감
+    // (긴 일정이 다른 날 때문에 내려가 있으면, 그 위 빈 공간으로 나중 일정이 올라감)
+    const bars = w.querySelector('.bars'), occ = Array.from({length:cols}, () => []), bottoms = new Array(cols).fill(0);
     for (const b of bars.children){
-      const c0 = +b.dataset.c0, c1 = +b.dataset.c1;
-      let top = 0; for (let c=c0; c<=c1; c++) top = Math.max(top, bottoms[c]);
+      const c0 = +b.dataset.c0, c1 = +b.dataset.c1, h = b.offsetHeight + gap;
+      const cand = [0];
+      for (let c=c0; c<=c1; c++) for (const [, bt] of occ[c]) cand.push(bt);
+      cand.sort((x,y)=>x-y);
+      let top = 0;
+      for (const t of cand){
+        let ok = true;
+        for (let c=c0; c<=c1 && ok; c++) for (const [a, bt] of occ[c]) if (t < bt && t + h > a){ ok = false; break; }
+        if (ok){ top = t; break; }
+      }
       b.style.top = top + 'px';
-      const bottom = top + b.offsetHeight + gap;
-      for (let c=c0; c<=c1; c++) bottoms[c] = bottom;
+      for (let c=c0; c<=c1; c++){ occ[c].push([top, top + h]); bottoms[c] = Math.max(bottoms[c], top + h); }
     }
     const h = Math.max(0, ...bottoms);
     bars.style.height = h + 'px';
@@ -794,16 +810,14 @@ function renderPanel(){
     const info = dayInfo(a);
     [...info.names, ...info.custom].forEach(n => tags += `<span class="tag red">${esc(n)}</span>`);
   }
-  const items = state.events.filter(e => e.start<=b && e.end>=a).sort((x,y) => ord(x)-ord(y));
-  const tasks = items.filter(e => e.type!=='memo'), memos = items.filter(e => e.type==='memo');
+  const items = state.events.filter(e => e.start<=b && e.end>=a).sort(dayOrder);
+  const tasks = items.filter(isTask), allDone = tasks.length && tasks.every(e => e.done);
   p.innerHTML = `
     <div class="pb scratch daytop">
       <div class="todoh"><span class="dtitle">${single ? `${+a.slice(5,7)}월 ${+a.slice(8)}일의 일정` : `${fmtDot(a)} - ${fmtDot(b)} ${diffDays(a,b)+1}일의 일정`}${tags}</span>
+        ${tasks.length ? `<button class="alldone" id="allDone" title="${allDone?'모두 완료 취소':'업무·회계 일정 모두 완료'}"><span class="ck ${allDone?'':'on'}">${CHECK}</span>${allDone?'완료 취소':'모두 완료'}</button>` : ''}
         <button class="iconbtn sheet-close" id="closePanel">✕</button></div>
-      ${items.length ? `<div class="lists">
-        ${tasks.length ? `<div class="list">${tasks.map(itemHTML).join('')}</div>` : ''}
-        ${memos.length ? `<div class="list">${memos.map(itemHTML).join('')}</div>` : ''}
-      </div>` : ''}
+      ${items.length ? `<div class="lists"><div class="list">${items.map(itemHTML).join('')}</div></div>` : ''}
     </div>
     <button class="addbar ${draft.trim()?'has':''}" id="addBar">${draft.trim() ? esc(draft.split('\n')[0]) : '+ 일정을 추가하세요'}</button>
     <div class="pb scratch daybot">
@@ -1250,7 +1264,7 @@ window.addEventListener('pointerup', ev => {
   clearTimeout(g.timer);
   document.body.classList.remove('bardrag'); clearDropMarks();
   g.ghost?.remove();
-  if (!g.on){ preview=null; if (g.touch && isMobile() && g.origin){ ghostUntil = Date.now()+500; selectRange(g.origin, g.origin); } else openItem(g.id, g.origin); return; }
+  if (!g.on){ preview=null; if (g.origin){ if (g.touch) ghostUntil = Date.now()+500; selectRange(g.origin, g.origin); } else openItem(g.id, g.origin); return; }
   const ev0 = state.events.find(x=>x.id===g.id); if (!ev0){ render(); return; }
   if (g.mode==='resize'){
     const p = preview; preview=null;
@@ -1261,10 +1275,10 @@ window.addEventListener('pointerup', ev => {
   const delta = d && g.origin ? diffDays(g.origin, d) : 0;
   const patch = {start:addDays(g.start,delta), end:addDays(g.end,delta)};
   // 순서: 놓은 위치 아래/위의 다른 일정 기준으로 끼워 넣기
-  const memoSide = ev0.type==='memo';
+  const grp = multi(ev0);
   const target = document.elementsFromPoint(ev.clientX, ev.clientY).find(n => n.classList?.contains('bar') && !n.classList.contains('ghost') && n.dataset.id!==g.id);
   if (d){
-    const day = state.events.filter(e => e.id!==g.id && e.start<=d && e.end>=d && (e.type==='memo')===memoSide).sort((x,y)=>ord(x)-ord(y));
+    const day = state.events.filter(e => e.id!==g.id && e.start<=d && e.end>=d && multi(e)===grp).sort(dayOrder);
     let pos = -1;
     if (target){
       const ti = day.findIndex(e => e.id===target.dataset.id);
@@ -1381,16 +1395,24 @@ window.addEventListener('pointerup', () => {
   suppressClick = true; setTimeout(()=>suppressClick=false, 50);
   document.body.style.userSelect='';
   const ids = [...g.list.querySelectorAll('.item')].map(x=>x.dataset.id);
-  const evs = ids.map(id => state.events.find(e=>e.id===id)).filter(Boolean);
-  const slots = evs.map(ord).sort((x,y)=>x-y);
+  const all = ids.map(id => state.events.find(e=>e.id===id)).filter(Boolean);
   checkpoint();
-  evs.forEach((e,i) => e.order = slots[i] + (i && slots[i]===slots[i-1] ? i*1e-3 : 0));
+  for (const grp of [0,1]){   // 하루짜리 / 여러 날 일정은 각각의 묶음 안에서 순서 변경
+    const evs = all.filter(e => multi(e)===grp), slots = evs.map(ord).sort((x,y)=>x-y);
+    evs.forEach((e,i) => e.order = slots[i] + (i && slots[i]<=slots[i-1] ? i*1e-3 : 0));
+  }
   save(); render();
 });
 $('#panel').addEventListener('click', ev => {
   if (suppressClick){ suppressClick=false; return; }
   const t = ev.target;
   if (t.closest('#addBar')){ openComposer(); return; }
+  if (t.closest('#allDone')){   // 선택한 날짜(기간)의 업무·회계 일정 모두 완료 / 모두 완료면 취소
+    const [a,b] = sel.a<=sel.b ? [sel.a,sel.b] : [sel.b,sel.a];
+    const tasks = state.events.filter(e => e.start<=b && e.end>=a && isTask(e)); if (!tasks.length) return;
+    const to = !tasks.every(e => e.done); checkpoint(); tasks.forEach(e => e.done = to); save(); render();
+    toast(to ? `${tasks.length}개 일정 완료` : '완료 취소'); return;
+  }
   if (t.closest('#closePanel')){ if (sel) deselectAll(); else $('#panel').classList.remove('open'); return; }
   const tog = t.closest('[data-tog]'); if (tog){ toggleDone(tog.dataset.tog); return; }
   const ct = t.closest('[data-ct]'); if (ct){ ctype=ct.dataset.ct; document.querySelectorAll('.tchip').forEach(x=>x.classList.toggle('on',x.dataset.ct===ctype)); $('#cText').focus(); return; }
