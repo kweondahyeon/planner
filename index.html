@@ -308,25 +308,26 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
 @media (max-width:900px){
   :root{--bg:#FFFFFF;--bar-h:16px;--bar-fs:10px;--bar-gap:4px;--head-h:38px;--gutter:0px}
   html,body{overflow:hidden;overscroll-behavior:none}
-  #app{width:100%;height:100dvh;padding:0 0 calc(24px + env(safe-area-inset-bottom))}
+  #app{width:100%;height:100dvh;padding:0 0 calc(32px + env(safe-area-inset-bottom))}
   /* 상단: 1줄(연도 · 아이콘) + 월 스트립 + 통계 */
-  .topbar{padding:max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));gap:8px 4px;background:var(--bg);border-bottom:1px solid rgba(0,0,0,.08);margin-bottom:8px}
+  .topbar{padding:max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 12px max(20px, env(safe-area-inset-left));gap:12px 4px;background:var(--bg);border-bottom:1px solid rgba(0,0,0,.08);margin-bottom:8px}
   .title{flex:1;order:0}
-  .title h1{font-size:22px}
+  .title h1{font-size:24px}
   #mseg,.spacer{display:none}
+  @media (display-mode: standalone){ .topbar{padding-top:max(calc(env(safe-area-inset-top) + 24px), 68px)} }
   .topbar .tlink{font-size:0;gap:0;width:36px;height:36px;padding:0;justify-content:center;color:var(--text)}
   .topbar .tlink svg{width:20px;height:20px}
   #todayBtn{order:1} #todoBtn{order:2} #reviewBtn{order:3} #setBtn{order:4;width:36px;height:36px}
   .topbar #reviewBtn{color:var(--sub)}
   .strip{order:5;width:100%;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-padding:0 12px}
   .strip::-webkit-scrollbar{display:none}
-  .mchip{flex:none;white-space:nowrap;height:32px;padding:0 12px;font-size:13px}
+  .mchip{flex:none;white-space:nowrap;height:32px;padding:0 12px;font-size:14px}
   .strip{background:transparent;padding:0}
   .mchip,.mchip:not(.on){color:var(--sub);font-weight:600;background:transparent}
   .mchip.on,.mchip.on:hover{background:transparent;color:#000;font-weight:800}
   .mchip.cur::before{display:none}
   .stats{display:none}
-  main{padding:0 8px}
+  main{padding:0 16px}
   /* 캘린더: 흰 배경 · 선 없음 · 가운데 정렬 */
   .cal,.cal.anchored{background:#fff;border-radius:0;box-shadow:none}
   .dow{border-bottom:0}
@@ -341,7 +342,7 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
   .cell.insel.sl{border-top-left-radius:12px;border-bottom-left-radius:12px}
   .cell.insel.sr{border-top-right-radius:12px;border-bottom-right-radius:12px}
   .dhead{height:28px;justify-content:center}
-  .num{font-size:15px;font-weight:600;min-width:28px;height:28px;border-radius:14px}
+  .num{font-size:13px;font-weight:600;min-width:28px;height:28px;border-radius:14px}
   .cell.today .num,.cell.hol.today .num{display:grid;background:var(--today);color:#fff}
   .cell.today .num::before{display:none}
   .hname{display:none}
@@ -349,20 +350,33 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
   .bar .t{display:block;white-space:nowrap;text-overflow:ellipsis;-webkit-line-clamp:1}
   .review .rh{padding:20px 20px 0} .rbody{padding:12px 20px 24px}
   /* 날짜 선택: 화면 가운데 팝업 (캘린더는 고정, 뒤 배경 딤) */
-  .panel,.panel.split{position:fixed;left:20px;right:20px;top:var(--vvc,50%);width:auto;height:min(calc(var(--vvh,100dvh) - 48px), 600px);display:flex;flex-direction:column;gap:0;overflow:hidden;background:#fff;border-radius:24px;z-index:41;box-shadow:0 20px 60px rgba(0,0,0,.18);opacity:0;pointer-events:none;transform:translateY(-50%) scale(.96);transition:opacity .16s,transform .16s}
-  .panel.open{opacity:1;pointer-events:auto;transform:translateY(-50%)}
-  .panel .pb.scratch{border-radius:0;box-shadow:none!important;padding:20px 20px 16px}
+  .panel,.panel.split{position:fixed;left:12%;right:12%;width:auto;height:min(56dvh,480px);top:calc(var(--vvt,0px) + 50% - min(28dvh,240px));display:flex;flex-direction:column;gap:0;overflow:hidden;background:#fff;border-radius:24px;z-index:41;box-shadow:0 20px 60px rgba(0,0,0,.18);opacity:0;pointer-events:none;transform:none;transition:opacity .16s}
+  .panel.open{opacity:1;pointer-events:auto;transform:none}
+  .panel::after{content:"";position:absolute;inset:0;border-radius:inherit;background:rgba(0,0,0,.24);opacity:0;pointer-events:none;transition:opacity .16s;z-index:1}
+  body.composing .panel::after{opacity:1;pointer-events:auto}
+  .panel .pb.scratch{border-radius:0;box-shadow:none!important;padding:20px 20px 12px}
   .panel .pb.scratch + .pb.scratch{border-top:1px solid var(--line)}
-  .panel .pb.scratch.daytop{flex:0 1 auto;max-height:55%;min-height:0;overflow:auto}
-  .panel .pb.scratch.daybot{flex:1 1 auto;min-height:0}
-  .panel .daybot .composer textarea{min-height:48px}
+  .panel .pb.scratch.daytop{flex:1 1 auto;max-height:none;min-height:0;overflow:auto}
+  .addbar{display:flex;flex:none;align-items:center;margin:0 16px 16px;height:52px;padding:0 16px;border-radius:14px;background:#F2F2F5;color:var(--sub);font-size:15px;font-weight:500;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .addbar.has{color:var(--text)}
+  /* 입력 바텀시트: 키보드 바로 위에 붙음 */
+  .panel .pb.scratch.daybot{position:fixed;left:0;right:0;top:calc(var(--vvt,0px) + var(--vvh,100dvh));z-index:2;border-top:0;border-radius:24px 24px 0 0;background:#fff;box-shadow:0 -8px 32px rgba(0,0,0,.12);padding:16px 16px 12px;transform:translateY(0);visibility:hidden;transition:transform .2s ease-out,visibility 0s .2s}
+  body.composing .panel .pb.scratch.daybot{transform:translateY(-100%);visibility:visible;transition:transform .2s ease-out}
+  .panel .daybot .todoh{display:none}
+  .panel .daybot .composer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 8px;margin:0;min-height:0}
+  .panel .daybot .composer textarea{grid-column:1 / -1;order:-1;min-height:48px;max-height:30vh;padding:4px 4px 0}
+  .panel .daybot .types{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0}
+  .panel .daybot .types::-webkit-scrollbar{display:none}
+  .panel .daybot .tchip{flex:none}
+  .panel .daybot #cAdd{display:none}
+  .panel .daybot .composer{grid-template-columns:minmax(0,1fr)}
+  .panel .daybot .types{align-items:center;min-height:32px}
   .panel .pb.scratch.todosec{flex:0 1 auto;max-height:45%}
   .panel .pb.scratch.memosec{flex:1 1 auto;min-height:0}
-  .sheet-close{display:grid}
   #todoBtn{display:flex}
   .row input,.composer textarea,.rich,.tdt,textarea{font-size:16px!important}
 }
-@media (min-width:901px){#scrim{display:none}}
+@media (min-width:901px){#scrim{display:none} .addbar{display:none} #cText::placeholder{color:transparent}}
 #scrim{position:fixed;inset:0;background:rgba(0,0,0,.24);z-index:40;opacity:0;pointer-events:none;transition:opacity .16s}
 body:has(.panel.open) #scrim{opacity:1;pointer-events:auto}
 #weeks.slide{transition:transform .16s ease-out,opacity .16s ease-out}
@@ -503,7 +517,7 @@ const Sync = (() => {
   const AUTH = 'kplanner:auth';
   const on = () => /^https:\/\//.test(SB.url) && SB.key.length>20;
   let sess = null; try { sess = JSON.parse(localStorage.getItem(AUTH)||'null'); } catch(e){}
-  let pushT = null, dirty = false, pulling = false, ready = false, last = null, err = '';
+  let pushT = null, dirty = false, pulling = false, ready = false, last = null, err = '', fresh = false;
   const setSess = s => { sess = s; try { s ? localStorage.setItem(AUTH, JSON.stringify(s)) : localStorage.removeItem(AUTH); } catch(e){} };
   const fromAuth = j => ({access_token:j.access_token, refresh_token:j.refresh_token, expires_at:j.expires_at || (Math.floor(Date.now()/1000)+(j.expires_in||3600)), user:{id:j.user?.id, email:j.user?.email}});
   async function auth(path, body){
@@ -534,13 +548,13 @@ const Sync = (() => {
     pulling = true;
     try {
       const rows = await rest('GET'); const row = rows[0];
-      if (row && (row.data?.mtime||0) > (state.mtime||0)){
+      if (row && (fresh || (row.data?.mtime||0) > (state.mtime||0))){   // 로그인 직후엔 서버 데이터가 우선 (로그인 전 기기에 남은 테스트 데이터로 덮어쓰지 않게)
         if (editing()){ pulling=false; return setTimeout(pull, 3000); }   // 입력 중엔 덮어쓰지 않고 잠시 뒤 다시
         const d = defaults(); state = {...d, ...row.data, settings:{...d.settings, ...(row.data.settings||{})}};
         clearTimeout(saveTimer); try { localStorage.setItem(STORE, JSON.stringify(state)); } catch(e){}
         dirty = false; render(); if ($('#modal').classList.contains('open')) renderSettings();
       } else if (!row || (row.data?.mtime||0) < (state.mtime||0)) dirty = true;
-      ready = true; last = Date.now(); err = '';
+      ready = true; fresh = false; last = Date.now(); err = '';
       if (dirty) await push();
     } catch(e){ err = e.message; }
     pulling = false; refreshUI();
@@ -562,7 +576,7 @@ const Sync = (() => {
   async function login(email, pw, signup){
     const j = signup ? await auth('signup', {email, password:pw}) : await auth('token?grant_type=password', {email, password:pw});
     if (!j.access_token) throw new Error('이메일 확인이 켜져 있어요. Supabase에서 Confirm email을 꺼 주세요');
-    setSess(fromAuth(j)); ready = false; await pull();
+    setSess(fromAuth(j)); ready = false; fresh = true; await pull();
   }
   function logout(){ setSess(null); ready=false; dirty=false; refreshUI(); }
   function refreshUI(){ if ($('#modal')?.classList.contains('open') && $('#syncBox')) $('#syncBox').innerHTML = boxHTML(); }
@@ -774,11 +788,12 @@ function renderPanel(){
         ${memos.length ? `<div class="list">${memos.map(itemHTML).join('')}</div>` : ''}
       </div>` : ''}
     </div>
+    <button class="addbar ${draft.trim()?'has':''}" id="addBar">${draft.trim() ? esc(draft.split('\n')[0]) : '+ 일정을 추가하세요'}</button>
     <div class="pb scratch daybot">
       <div class="todoh"><span>신규 일정 추가</span></div>
       <div class="composer">
         <div class="types">${Object.entries(TYPES).map(([k,v])=>`<button class="tchip ${k===ctype?'on':''}" data-ct="${k}"><i style="background:${v.color};${k==='memo'?'box-shadow:inset 0 0 0 1px var(--memo-bd)':''}"></i>${v.label}</button>`).join('')}</div>
-        <textarea id="cText">${esc(draft)}</textarea>
+        <textarea id="cText" placeholder="일정을 입력하세요" enterkeyhint="done">${esc(draft)}</textarea>
         <button class="btn full" id="cAdd" ${draft.trim()?'':'disabled'}>등록</button>
       </div>
     </div>`;
@@ -960,8 +975,18 @@ function createFromComposer(){
   draft = ''; save();
   return title;
 }
+let composeClosedAt = 0;
+function openComposer(){ document.body.classList.add('composing'); const t=$('#cText'); if (t){ t.focus({preventScroll:true}); t.setSelectionRange(t.value.length,t.value.length); } }
+function closeComposer(){ if (!document.body.classList.contains('composing')) return; document.body.classList.remove('composing'); composeClosedAt = Date.now(); if (document.activeElement?.id==='cText') document.activeElement.blur(); const b=$('#addBar'); if (b){ b.classList.toggle('has', !!draft.trim()); b.textContent = draft.trim() ? draft.split('\n')[0] : '+ 일정을 추가하세요'; } }
+document.addEventListener('beforeinput', ev => {   // 모바일 키보드의 완료(엔터) = 등록 (한글 조합 중에도 동작)
+  if (ev.target.id==='cText' && isMobile() && (ev.inputType==='insertLineBreak' || ev.inputType==='insertParagraph')){
+    ev.preventDefault(); setTimeout(() => { draft = $('#cText').value; addFromComposer(); }, 0);
+  }
+});
+document.addEventListener('focusout', ev => { if (ev.target.id==='cText' && isMobile()) setTimeout(() => { if (document.activeElement?.id!=='cText') closeComposer(); }, 60); });
 function addFromComposer(){
   if (!createFromComposer()){ $('#cText')?.focus(); return; }
+  if (isMobile()){ document.body.classList.remove('composing'); composeClosedAt = Date.now(); document.activeElement?.blur?.(); renderNoPanel(); renderPanel(); return; }
   renderNoPanel(); renderPanel();
   setTimeout(()=>$('#cText')?.focus(),0);
 }
@@ -1006,8 +1031,7 @@ function selectRange(a,b){
   commitDraft();
   sel={a,b}; expId=null; ctype='work';   // 날짜를 새로 고르면 유형은 항상 [업무]로
   render(); $('#panel').classList.add('open');
-  if (isMobile()) $('#cText')?.focus({preventScroll:true});   // 모바일: 탭 이벤트 안에서 바로 포커스해야 키보드가 뜸
-  else setTimeout(()=>$('#cText')?.focus({preventScroll:true}),0);   // 날짜를 고르면 바로 입력할 수 있게
+  if (!isMobile()) setTimeout(()=>$('#cText')?.focus({preventScroll:true}),0);   // 날짜를 고르면 바로 입력할 수 있게 (모바일은 입력 바를 눌러야 시트+키보드)
 }
 function revealSel(){
   setTimeout(()=>{
@@ -1052,14 +1076,16 @@ $('#strip').onclick = ev => {
   else if (b.dataset.m){ mode='cal'; goMonth(view.y, +b.dataset.m); }
 };
 $('#setBtn').onclick = openSettings;
+$('#panel').addEventListener('pointerdown', ev => { if (isMobile() && ev.target.closest('.daybot button')) ev.preventDefault(); });   // 시트 안 버튼을 눌러도 키보드 유지
 $('#scrim').addEventListener('click', ev => {   // 팝업 바깥: 닫기만 (상단 오늘/TO DO 아이콘 위치는 그 버튼으로 전달 → 한 번 더 누르면 닫힘)
+  if (document.body.classList.contains('composing') || Date.now()-composeClosedAt < 300){ closeComposer(); return; }   // 입력 시트가 열려 있으면 시트만 닫기
   const hit = document.elementsFromPoint(ev.clientX, ev.clientY).map(n => n.closest?.('#todoBtn, #todayBtn')).find(Boolean);
   if (hit) return hit.click();
   if (sel) deselectAll(); else $('#panel').classList.remove('open');
 });
 /* 키보드가 올라와도 팝업이 보이는 영역 가운데 오도록 */
 if (window.visualViewport){
-  const vv = visualViewport, f = () => { const r=document.documentElement.style; r.setProperty('--vvc', (vv.offsetTop + vv.height/2)+'px'); r.setProperty('--vvh', vv.height+'px'); };
+  const vv = visualViewport, f = () => { const r=document.documentElement.style; r.setProperty('--vvc', (vv.offsetTop + vv.height/2)+'px'); r.setProperty('--vvh', vv.height+'px'); r.setProperty('--vvt', vv.offsetTop+'px'); };
   vv.addEventListener('resize', f); vv.addEventListener('scroll', f); f();
 }
 
@@ -1334,6 +1360,7 @@ window.addEventListener('pointerup', () => {
 $('#panel').addEventListener('click', ev => {
   if (suppressClick){ suppressClick=false; return; }
   const t = ev.target;
+  if (t.closest('#addBar')){ openComposer(); return; }
   if (t.closest('#closePanel')){ if (sel) deselectAll(); else $('#panel').classList.remove('open'); return; }
   const tog = t.closest('[data-tog]'); if (tog){ toggleDone(tog.dataset.tog); return; }
   const ct = t.closest('[data-ct]'); if (ct){ ctype=ct.dataset.ct; document.querySelectorAll('.tchip').forEach(x=>x.classList.toggle('on',x.dataset.ct===ctype)); $('#cText').focus(); return; }
@@ -1367,10 +1394,10 @@ $('#panel').addEventListener('change', ev => {
 $('#panel').addEventListener('keydown', ev => {
   if (ev.target.id==='iTitle' && ev.key==='Enter' && !ev.isComposing){ ev.preventDefault(); ev.target.blur(); }
   if (ev.target.id==='scratchBody') richKeydown(ev, ev.target, saveScratch);
-  if (ev.target.id==='cText' && ev.key==='Enter' && !ev.shiftKey && !ev.isComposing && ev.keyCode!==229){ ev.preventDefault(); addFromComposer(); }
+  if (ev.target.id==='cText' && ev.key==='Enter' && !ev.shiftKey && !ev.isComposing && ev.keyCode!==229){ ev.preventDefault(); if (!isMobile()) addFromComposer(); else { draft = ev.target.value; addFromComposer(); } }
   if (ev.target.classList.contains('tdt') && ev.key==='Enter' && !ev.isComposing){ ev.preventDefault(); if (ev.target.value.trim()) addTodo(ev.target.closest('[data-td]').dataset.td); }
 });
-function deselectAll(){ commitDraft(); expId=null; sel=null; document.activeElement?.blur?.(); $('#panel').classList.remove('open'); render(); }
+function deselectAll(){ document.body.classList.remove('composing'); commitDraft(); expId=null; sel=null; document.activeElement?.blur?.(); $('#panel').classList.remove('open'); render(); }
 /* 편집 중인 일정 바깥을 누르면 저장된 채로 편집 종료 / 캘린더 바깥 회색 배경을 누르면 선택 해제(Esc와 동일) */
 document.addEventListener('pointerdown', ev => {
   if (ev.button!==0 || mode!=='cal' || $('#modal').classList.contains('open')) return;
