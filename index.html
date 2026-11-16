@@ -82,7 +82,10 @@ body.mode-review .cal, body.mode-review .panel{display:none}
 .dow span{padding:12px 12px 8px;font-size:12px;font-weight:700;color:var(--sub);text-align:left}
 .weeks{flex:1;overflow:auto;user-select:none;-webkit-user-select:none;display:flex;flex-direction:column;overscroll-behavior:contain}
 .wk b{display:block;color:var(--sub);font-weight:800;margin-bottom:4px}
-.week{position:relative;display:grid;grid-template-columns:var(--gutter) minmax(0,1fr);border-bottom:1px solid var(--line);flex:1 0 auto}
+.week{position:relative;display:grid;grid-template-columns:var(--gutter) minmax(0,1fr);border-bottom:1px solid var(--line);flex:1 1 0;overflow:hidden}
+.cell{--cellbg:var(--surface)} .cell.out{--cellbg:var(--out)} .cell.insel{--cellbg:var(--selbg)}
+.cell.more::after{content:"";position:absolute;left:0;right:0;bottom:0;height:32px;background:linear-gradient(to bottom,transparent,var(--cellbg) 85%);pointer-events:none;z-index:2}
+body.two .cell.more::after{height:14px}
 .weeks > .week:last-child{border-bottom:0}
 .wk{font-size:10px;font-weight:700;color:var(--faint);padding:12px 0 0 12px;letter-spacing:.02em}
 .cells{grid-column:2;display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));position:relative}
@@ -225,7 +228,7 @@ body.bardrag .bar{pointer-events:auto}
 body.mode-review .review{display:flex}
 .review .rh{padding:28px 40px 0;font-size:13px;font-weight:700;color:var(--faint);letter-spacing:.02em}
 .review .rh{display:flex;justify-content:space-between;align-items:center;min-height:56px}
-.rbody{flex:1;overflow:auto;outline:0;padding:16px 40px 40px;font-size:15px;line-height:1.8;white-space:pre-wrap;word-break:break-word}
+.rbody{--rpt:16px;--rpx:40px;position:relative;flex:1;overflow:auto;outline:0;padding:var(--rpt) var(--rpx) 40px;font-size:15px;line-height:1.8;white-space:pre-wrap;word-break:break-word}
 .rbody hr{border:0;height:1px;background:#000;margin:20px 0}
 .review{position:relative}
 .rtools{display:flex;gap:16px}
@@ -239,7 +242,9 @@ body.mode-review .review{display:flex}
 .ttools button:hover{background:#3A3A3F}
 .ttools .del{color:#FF9B9B}
 .ttools i{width:1px;background:#3A3A3F;margin:4px 4px}
-.rbody:empty::before{content:"올해 한 일, 성과, 배운 점을 자유롭게 기록하세요. 구분이 필요하면 '---' 입력 후 Enter 또는 우측 상단 [디바이더 추가]";color:var(--faint)}
+/* 비어 있을 때 커서 높이를 한글 글꼴 기준으로 → 안내 문구와 세로 정렬 일치 */
+.rbody:empty{font-family:"Apple SD Gothic Neo","Malgun Gothic",-apple-system,BlinkMacSystemFont,sans-serif}
+.rbody:empty::before{content:"내용을 입력하세요";color:var(--faint);position:absolute;top:var(--rpt);left:var(--rpx);line-height:inherit;pointer-events:none}
 
 /* ---------- Modal ---------- */
 .modal{position:fixed;inset:0;background:rgba(20,20,24,.35);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
@@ -338,7 +343,8 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
   .dow{border-bottom:0}
   .dow span{text-align:center;padding:8px 0;font-size:12px;font-weight:600}
   .weeks{touch-action:pan-y;-webkit-touch-callout:none}
-  .week{border-bottom:0}
+  .week{border-bottom:0;flex:1 1 0;min-height:0!important;overflow:hidden}
+  .cell.out{--cellbg:#fff}
   .wk{display:none}
   .cell{border-left:0;padding:8px 0 0}
   .cell:hover{background:transparent}
@@ -354,14 +360,14 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
   .bar{padding:0 4px;margin:0 2px;align-items:center}
   .bar:not(.cl){margin-left:4px} .bar:not(.cr){margin-right:4px}
   .bar .t{display:block;white-space:nowrap;text-overflow:ellipsis;-webkit-line-clamp:1}
-  .review .rh{padding:20px 20px 0;flex-wrap:wrap;gap:8px} .rbody{padding:12px 20px 24px;overflow-x:hidden}
+  .review .rh{padding:20px 20px 0;flex-wrap:wrap;gap:8px} .rbody{--rpt:12px;--rpx:20px;padding:12px 20px 24px;overflow-x:hidden}
   body.mode-review .title h1{font-size:30px}
   .rbody table{table-layout:fixed;width:100%} .rbody td{min-width:0;padding:6px 8px;word-break:break-all}
   .review{border-radius:0;background:#fff}
   body.mode-review #setBtn{display:none}
   body.mode-review .topbar{margin-bottom:0}
   /* 날짜 선택: 화면 가운데 팝업 (캘린더는 고정, 뒤 배경 딤) */
-  .panel,.panel.split{--ph:70dvh;--ptop:calc((100dvh - var(--ph)) / 2);position:fixed;left:12%;right:12%;width:auto;height:var(--ph);top:var(--ptop);display:flex;flex-direction:column;gap:0;overflow:hidden;background:#fff;border-radius:24px;z-index:41;box-shadow:0 20px 60px rgba(0,0,0,.18);opacity:0;pointer-events:none;transform:none;transition:opacity .16s,top .25s ease-out,height .25s ease-out}
+  .panel,.panel.split{--ph:60dvh;--ptop:calc((100dvh - var(--ph)) / 2);position:fixed;left:10%;right:10%;width:auto;height:var(--ph);top:var(--ptop);display:flex;flex-direction:column;gap:0;overflow:hidden;background:#fff;border-radius:24px;z-index:41;box-shadow:0 20px 60px rgba(0,0,0,.18);opacity:0;pointer-events:none;transform:none;transition:opacity .16s,top .25s ease-out,height .25s ease-out}
   .panel.open{opacity:1;pointer-events:auto;transform:none}
   /* TO DO·MEMO·일정 편집 입력 시: 키보드 위로 팝업을 올려서 화면이 밀리지 않게 */
   body.kb .panel{--ptop:calc(env(safe-area-inset-top) + 12px);height:min(var(--ph), calc(var(--vvh,100dvh) - env(safe-area-inset-top) - 24px))}
@@ -371,7 +377,7 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
   .addbar{display:flex;flex:none;align-items:center;margin:0 16px 16px;height:52px;padding:0 16px;border-radius:14px;background:#F2F2F5;color:var(--sub);font-size:15px;font-weight:500;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .addbar.has{color:var(--text)}
   /* 일정 입력: 같은 크기의 팝업이 위에 덮임 */
-  .panel .pb.scratch.daybot{position:fixed;left:12%;right:12%;top:var(--ptop);height:var(--ph);z-index:2;border-top:0;border-radius:24px;background:#fff;padding:20px;opacity:0;visibility:hidden;transition:opacity .14s,visibility 0s .14s;display:flex;flex-direction:column}
+  .panel .pb.scratch.daybot{position:fixed;left:10%;right:10%;top:var(--ptop);height:var(--ph);z-index:2;border-top:0;border-radius:24px;background:#fff;padding:20px;opacity:0;visibility:hidden;transition:opacity .14s,visibility 0s .14s;display:flex;flex-direction:column}
   body.composing .panel .pb.scratch.daybot{opacity:1;visibility:visible;transition:opacity .14s}
   .panel .daybot .todoh{display:none}
   .panel .daybot .composer{display:flex;flex-direction:column;gap:16px;margin:0;min-height:0;flex:1}
@@ -752,7 +758,7 @@ function renderGrid(){
   const headH = cssPx('--head-h');
   // 날짜(열)별로 위에서부터 4px 간격으로 촘촘히 쌓기. 여러 날 일정은 걸친 열 중 가장 낮은 위치에 맞춤
   const gap = cssPx('--bar-gap'), cols = COLS.length;
-  box.querySelectorAll('.week').forEach(w => {
+  box.querySelectorAll('.week').forEach(w => {   // (아래 return은 forEach 콜백 종료)
     const bars = w.querySelector('.bars'), bottoms = new Array(cols).fill(0);
     for (const b of bars.children){
       const c0 = +b.dataset.c0, c1 = +b.dataset.c1;
@@ -763,8 +769,9 @@ function renderGrid(){
     }
     const h = Math.max(0, ...bottoms);
     bars.style.height = h + 'px';
-    const need = headH + h + 8;
-    if (need > parseFloat(w.style.minHeight)) w.style.minHeight = need + 'px';
+    // 칸 높이 고정: 넘치는 칸은 하단 그라데이션 (눌러서 패널/팝업에서 전체 확인)
+    const avail = w.clientHeight - headH, cells = w.querySelectorAll('.cell');
+    bottoms.forEach((bt,c) => cells[c]?.classList.toggle('more', bt - gap > avail));
   });
 }
 
