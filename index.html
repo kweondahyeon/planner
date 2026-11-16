@@ -299,7 +299,9 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
 /* ---------- Toast ---------- */
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#18181B;color:#fff;border-radius:10px;padding:12px 16px;font-size:13px;display:flex;gap:16px;align-items:center;opacity:0;pointer-events:none;transition:.2s;z-index:60}
 .toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
-.toast button{color:#9DB4FF;font-weight:700}
+.toast button{color:#9DB4FF;font-weight:700;flex:none;white-space:nowrap}
+.toast{max-width:calc(100vw - 32px);white-space:nowrap}
+#toastMsg{min-width:0;overflow:hidden;text-overflow:ellipsis}
 
 /* ---------- Mobile ---------- */
 @media (min-width:901px) and (max-width:1480px){.topbar{gap:12px}.stats{gap:12px}}
@@ -352,40 +354,36 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
   .bar{padding:0 4px;margin:0 2px;align-items:center}
   .bar:not(.cl){margin-left:4px} .bar:not(.cr){margin-right:4px}
   .bar .t{display:block;white-space:nowrap;text-overflow:ellipsis;-webkit-line-clamp:1}
-  .review .rh{padding:20px 20px 0;flex-wrap:wrap;gap:8px} .rbody{padding:12px 20px 24px;font-size:16px;overflow-x:hidden}
+  .review .rh{padding:20px 20px 0;flex-wrap:wrap;gap:8px} .rbody{padding:12px 20px 24px;overflow-x:hidden}
+  body.mode-review .title h1{font-size:30px}
   .rbody table{table-layout:fixed;width:100%} .rbody td{min-width:0;padding:6px 8px;word-break:break-all}
   .review{border-radius:0;background:#fff}
   body.mode-review #setBtn{display:none}
   body.mode-review .topbar{margin-bottom:0}
   /* 날짜 선택: 화면 가운데 팝업 (캘린더는 고정, 뒤 배경 딤) */
-  .panel,.panel.split{--ph:min(34dvh,288px);position:fixed;left:12%;right:12%;width:auto;height:var(--ph);top:calc(var(--vvt,0px) + (100dvh - var(--ph)) / 2);display:flex;flex-direction:column;gap:0;overflow:hidden;background:#fff;border-radius:24px;z-index:41;box-shadow:0 20px 60px rgba(0,0,0,.18);opacity:0;pointer-events:none;transform:none;transition:opacity .16s}
+  .panel,.panel.split{--ph:70dvh;--ptop:calc((100dvh - var(--ph)) / 2);position:fixed;left:12%;right:12%;width:auto;height:var(--ph);top:var(--ptop);display:flex;flex-direction:column;gap:0;overflow:hidden;background:#fff;border-radius:24px;z-index:41;box-shadow:0 20px 60px rgba(0,0,0,.18);opacity:0;pointer-events:none;transform:none;transition:opacity .16s,top .25s ease-out,height .25s ease-out}
   .panel.open{opacity:1;pointer-events:auto;transform:none}
-  /* 키보드가 올라와 화면이 밀려도 뒤 캘린더는 제자리 */
-  .topbar,.cal{transform:translateY(var(--vvt,0px))}
-  .panel::after{content:"";position:absolute;inset:0;border-radius:inherit;background:rgba(0,0,0,.24);opacity:0;pointer-events:none;transition:opacity .16s;z-index:1}
-  body.composing .panel::after{opacity:1;pointer-events:auto}
+  /* TO DO·MEMO·일정 편집 입력 시: 키보드 위로 팝업을 올려서 화면이 밀리지 않게 */
+  body.kb .panel{--ptop:calc(env(safe-area-inset-top) + 12px);height:min(var(--ph), calc(var(--vvh,100dvh) - env(safe-area-inset-top) - 24px))}
   .panel .pb.scratch{border-radius:0;box-shadow:none!important;padding:20px 20px 12px}
   .panel .pb.scratch + .pb.scratch{border-top:1px solid var(--line)}
   .panel .pb.scratch.daytop{flex:1 1 auto;max-height:none;min-height:0;overflow:auto}
   .addbar{display:flex;flex:none;align-items:center;margin:0 16px 16px;height:52px;padding:0 16px;border-radius:14px;background:#F2F2F5;color:var(--sub);font-size:15px;font-weight:500;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .addbar.has{color:var(--text)}
-  /* 입력 바텀시트: 키보드 바로 위에 붙음 */
-  .panel .pb.scratch.daybot{position:fixed;left:0;right:0;top:calc(var(--vvt,0px) + var(--vvh,100dvh));z-index:2;border-top:0;border-radius:24px 24px 0 0;background:#fff;box-shadow:0 -8px 32px rgba(0,0,0,.12);padding:16px 16px 12px;transform:translateY(0);visibility:hidden;transition:transform .2s ease-out,visibility 0s .2s}
-  body.composing .panel .pb.scratch.daybot{transform:translateY(-100%);visibility:visible;transition:transform .2s ease-out}
+  /* 일정 입력: 같은 크기의 팝업이 위에 덮임 */
+  .panel .pb.scratch.daybot{position:fixed;left:12%;right:12%;top:var(--ptop);height:var(--ph);z-index:2;border-top:0;border-radius:24px;background:#fff;padding:20px;opacity:0;visibility:hidden;transition:opacity .14s,visibility 0s .14s;display:flex;flex-direction:column}
+  body.composing .panel .pb.scratch.daybot{opacity:1;visibility:visible;transition:opacity .14s}
   .panel .daybot .todoh{display:none}
-  .panel .pb.scratch.daybot::after{content:"";position:absolute;left:0;right:0;top:100%;height:420px;background:#fff}
-  .panel .daybot .composer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 8px;margin:0;min-height:0}
-  .panel .daybot .composer textarea{grid-column:1 / -1;order:-1;min-height:48px;max-height:30vh;padding:4px 4px 0}
-  .panel .daybot .types{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0}
+  .panel .daybot .composer{display:flex;flex-direction:column;gap:16px;margin:0;min-height:0;flex:1}
+  .panel .daybot .composer textarea{order:-2;flex:none;height:96px;min-height:0;padding:0}
+  .panel .daybot .types{flex-wrap:wrap;gap:6px;margin:0;flex:none;order:-1;align-items:center;min-height:32px}
   .panel .daybot .types::-webkit-scrollbar{display:none}
   .panel .daybot .tchip{flex:none}
   .panel .daybot #cAdd{display:none}
-  .panel .daybot .composer{grid-template-columns:minmax(0,1fr)}
-  .panel .daybot .types{align-items:center;min-height:32px}
   .panel .pb.scratch.todosec{flex:0 1 auto;max-height:45%}
   .panel .pb.scratch.memosec{flex:1 1 auto;min-height:0}
   #todoBtn{display:flex}
-  .row input,.composer textarea,.rich,.tdt,textarea{font-size:16px!important}
+  .row input,.composer textarea,.rich,.tdt,.daybot textarea{font-size:16px!important}
 }
 @media (min-width:901px){#scrim{display:none} .addbar{display:none} #cText::placeholder{color:transparent}}
 #scrim{position:fixed;inset:0;background:rgba(0,0,0,.24);z-index:40;opacity:0;pointer-events:none;transition:opacity .16s}
@@ -995,7 +993,14 @@ document.addEventListener('beforeinput', ev => {   // 모바일 키보드의 완
     ev.preventDefault(); setTimeout(() => { draft = $('#cText').value; addFromComposer(); }, 0);
   }
 });
-document.addEventListener('focusout', ev => { if (ev.target.id==='cText' && isMobile()) setTimeout(() => { if (document.activeElement?.id!=='cText') closeComposer(); }, 60); });
+document.addEventListener('focusout', () => { if (isMobile()) setTimeout(() => { const a=document.activeElement; if (!a || !$('#panel').contains(a) || a.id==='cText' || !(a.isContentEditable || /^(INPUT|TEXTAREA)$/.test(a.tagName))) document.body.classList.remove('kb'); }, 80); });
+/* TO DO·MEMO·일정 편집 칸을 누르는 순간(키보드 뜨기 전) 팝업을 위로 → 아이폰이 화면을 밀어 올리지 않음 */
+$('#panel').addEventListener('touchstart', ev => {
+  if (!isMobile()) return;
+  const f = ev.target.closest('input, textarea, [contenteditable="true"]');
+  if (f && f.id!=='cText') document.body.classList.add('kb');
+  if (ev.target.closest('.daybot') && !ev.target.closest('button') && ev.target.id!=='cText'){ ev.preventDefault(); $('#cText').focus(); }
+}, {passive:false});
 function addFromComposer(){
   if (!createFromComposer()){ $('#cText')?.focus(); return; }
   if (isMobile()){ document.body.classList.remove('composing'); composeClosedAt = Date.now(); document.activeElement?.blur?.(); renderNoPanel(); renderPanel(); return; }
@@ -1066,6 +1071,7 @@ function setMode(mo){
 
 let toastTimer;
 function toast(msg, act, fn){
+  if (isMobile()) msg = msg.replace(/ · ⌘Z 되돌리기$/, '');
   const el=$('#toast'); $('#toastMsg').textContent=msg; const b=$('#toastAct');
   b.textContent=act||''; b.style.display=act?'':'none'; b.onclick=()=>{ fn&&fn(); el.classList.remove('show'); };
   el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'), act?5000:2200);
@@ -1079,7 +1085,7 @@ $('#todayBtn').onclick = () => {
   if (isMobile() && $('#panel').classList.contains('open') && sel && sel.a===TODAY && sel.b===TODAY) return deselectAll();   // 한 번 더 누르면 닫기
   mode='cal'; view={y:now.getFullYear(), m:now.getMonth()}; selectRange(TODAY,TODAY); };
 $('#reviewBtn').onclick = () => setMode('review');
-$('#todoBtn').onclick = () => { if ($('#panel').classList.contains('open') && !sel) { $('#panel').classList.remove('open'); return; }
+$('#todoBtn').onclick = () => { if ($('#panel').classList.contains('open') && !sel) { document.body.classList.remove('kb'); $('#panel').classList.remove('open'); return; }
   if (mode!=='cal') setMode('cal'); commitDraft(); sel=null; expId=null; render(); $('#panel').classList.add('open'); };
 $('#mseg').onclick = ev => { const b = ev.target.closest('button'); if(!b) return; state.settings.months = +b.dataset.v; save(); render(); };
 $('#strip').onclick = ev => {
@@ -1090,10 +1096,10 @@ $('#strip').onclick = ev => {
 $('#setBtn').onclick = openSettings;
 $('#panel').addEventListener('pointerdown', ev => { if (isMobile() && ev.target.closest('.daybot button')) ev.preventDefault(); });   // 시트 안 버튼을 눌러도 키보드 유지
 $('#scrim').addEventListener('click', ev => {   // 팝업 바깥: 닫기만 (상단 오늘/TO DO 아이콘 위치는 그 버튼으로 전달 → 한 번 더 누르면 닫힘)
-  if (document.body.classList.contains('composing') || Date.now()-composeClosedAt < 300){ closeComposer(); return; }   // 입력 시트가 열려 있으면 시트만 닫기
+  if (Date.now()-composeClosedAt < 300) return;
   const hit = document.elementsFromPoint(ev.clientX, ev.clientY).map(n => n.closest?.('#todoBtn, #todayBtn')).find(Boolean);
   if (hit) return hit.click();
-  if (sel) deselectAll(); else $('#panel').classList.remove('open');
+  if (sel) deselectAll(); else { document.body.classList.remove('kb'); document.activeElement?.blur?.(); $('#panel').classList.remove('open'); }
 });
 /* 키보드가 올라와도 팝업이 보이는 영역 가운데 오도록 */
 if (window.visualViewport){
@@ -1409,7 +1415,7 @@ $('#panel').addEventListener('keydown', ev => {
   if (ev.target.id==='cText' && ev.key==='Enter' && !ev.shiftKey && !ev.isComposing && ev.keyCode!==229){ ev.preventDefault(); if (!isMobile()) addFromComposer(); else { draft = ev.target.value; addFromComposer(); } }
   if (ev.target.classList.contains('tdt') && ev.key==='Enter' && !ev.isComposing){ ev.preventDefault(); if (ev.target.value.trim()) addTodo(ev.target.closest('[data-td]').dataset.td); }
 });
-function deselectAll(){ document.body.classList.remove('composing'); commitDraft(); expId=null; sel=null; document.activeElement?.blur?.(); $('#panel').classList.remove('open'); render(); }
+function deselectAll(){ document.body.classList.remove('composing','kb'); commitDraft(); expId=null; sel=null; document.activeElement?.blur?.(); $('#panel').classList.remove('open'); render(); }
 /* 편집 중인 일정 바깥을 누르면 저장된 채로 편집 종료 / 캘린더 바깥 회색 배경을 누르면 선택 해제(Esc와 동일) */
 document.addEventListener('pointerdown', ev => {
   if (ev.button!==0 || mode!=='cal' || $('#modal').classList.contains('open')) return;
