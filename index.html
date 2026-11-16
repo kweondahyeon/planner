@@ -370,7 +370,7 @@ textarea.io{width:100%;height:88px;border:1px solid var(--line);border-radius:7p
   .panel,.panel.split{--ph:60dvh;--ptop:calc((100dvh - var(--ph)) / 2);position:fixed;left:10%;right:10%;width:auto;height:var(--ph);top:var(--ptop);display:flex;flex-direction:column;gap:0;overflow:hidden;background:#fff;border-radius:24px;z-index:41;box-shadow:0 20px 60px rgba(0,0,0,.18);opacity:0;pointer-events:none;transform:none;transition:opacity .16s,top .25s ease-out,height .25s ease-out}
   .panel.open{opacity:1;pointer-events:auto;transform:none}
   /* TO DO·MEMO·일정 편집 입력 시: 키보드 위로 팝업을 올려서 화면이 밀리지 않게 */
-  body.kb .panel{--ptop:calc(env(safe-area-inset-top) + 12px);height:min(var(--ph), calc(var(--vvh,100dvh) - env(safe-area-inset-top) - 24px))}
+  body.kb .panel{--ptop:calc(env(safe-area-inset-top) + 12px);height:min(var(--ph), 40dvh, calc(var(--vvh,100dvh) - env(safe-area-inset-top) - 24px));transition:opacity .16s}
   .panel .pb.scratch{border-radius:0;box-shadow:none!important;padding:20px 20px 12px}
   .panel .pb.scratch + .pb.scratch{border-top:1px solid var(--line)}
   .panel .pb.scratch.daytop{flex:1 1 auto;max-height:none;min-height:0;overflow:auto}
@@ -1001,11 +1001,30 @@ document.addEventListener('beforeinput', ev => {   // 모바일 키보드의 완
   }
 });
 document.addEventListener('focusout', () => { if (isMobile()) setTimeout(() => { const a=document.activeElement; if (!a || !$('#panel').contains(a) || a.id==='cText' || !(a.isContentEditable || /^(INPUT|TEXTAREA)$/.test(a.tagName))) document.body.classList.remove('kb'); }, 80); });
-/* TO DO·MEMO·일정 편집 칸을 누르는 순간(키보드 뜨기 전) 팝업을 위로 → 아이폰이 화면을 밀어 올리지 않음 */
+/* TO DO·MEMO·일정 편집 칸에 포커스되는 즉시 팝업을 키보드 위 영역으로 옮기고 줄임 → 커서가 보이는 영역 안에 있어 아이폰이 화면을 밀어 올리지 않음 */
+document.addEventListener('focusin', ev => {
+  if (!isMobile()) return;
+  const f = ev.target;
+  if ($('#panel').contains(f) && f.id!=='cText' && (f.isContentEditable || /^(INPUT|TEXTAREA)$/.test(f.tagName))){ document.body.classList.add('kb'); keepCaretVisible(); }
+});
+function keepCaretVisible(){   // 팝업 안 스크롤 영역에서 커서가 가려지면 그 영역만 스크롤
+  requestAnimationFrame(() => {
+    const a = document.activeElement; if (!a || !$('#panel').contains(a)) return;
+    const box = a.isContentEditable ? a : (a.closest('.pb') || a);
+    let r = null;
+    if (a.isContentEditable){ const sel = getSelection(); if (sel.rangeCount){ const rr = sel.getRangeAt(0).getClientRects(); r = rr[rr.length-1] || sel.getRangeAt(0).startContainer.parentElement?.getBoundingClientRect(); } }
+    else r = a.getBoundingClientRect();
+    if (!r) return;
+    const b = box.getBoundingClientRect(), vb = (window.visualViewport ? visualViewport.height : innerHeight) - 8;
+    const bottom = Math.min(b.bottom, vb);
+    if (r.bottom > bottom) box.scrollTop += r.bottom - bottom + 8;
+    else if (r.top < b.top) box.scrollTop -= b.top - r.top + 8;
+  });
+}
+if (window.visualViewport) visualViewport.addEventListener('resize', () => { if (document.body.classList.contains('kb')) setTimeout(keepCaretVisible, 60); });
+document.addEventListener('input', () => { if (document.body.classList.contains('kb')) keepCaretVisible(); });
 $('#panel').addEventListener('touchstart', ev => {
   if (!isMobile()) return;
-  const f = ev.target.closest('input, textarea, [contenteditable="true"]');
-  if (f && f.id!=='cText') document.body.classList.add('kb');
   if (ev.target.closest('.daybot') && !ev.target.closest('button') && ev.target.id!=='cText'){ ev.preventDefault(); $('#cText').focus(); }
 }, {passive:false});
 function addFromComposer(){
